@@ -23,10 +23,9 @@ app.post("/api/files/upload", (req, res, next) => {
                 if (err)
                     res.status(500).send()
                 var url = curent_path + ".png";
-                res.status(200).send({
-                    success: true,
-                    url
-                })
+                res.status(200).send(
+                    url.toString() + " "
+                )
             })
             ok = false;
         }
@@ -42,9 +41,9 @@ app.delete("/api/files/:id", (req, res, next) => {
                 console.error(err)
                 return;
             }
-            res.status(200).send({
-                success: true
-            })
+            res.status(200).send(
+                "true"
+            )
         })
         ok = false;
     }
