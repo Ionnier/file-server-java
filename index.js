@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 var fileupload = require('express-fileupload');
 const app = express();
+const mime = require('mime-types')
 app.use(fileupload());
 
 if (!fs.existsSync('./files')) {
@@ -14,17 +15,19 @@ app.get("/", (req, res, next) => {
 
 app.post("/api/files/upload", (req, res, next) => {
     const file = req.files.photo;
+    var re = /(?:\.([^.]+))?$/;
+    var ext = "." + re.exec(file.name)[1];
     var ok = true;
     while (ok) {
         var curent_path = makeid(15);
-        if (fs.existsSync('./files/' + curent_path + ".png") === false) {
+        if (fs.existsSync('./files/' + curent_path + ext) === false) {
             const file = req.files.photo;
-            file.mv('./files/' + curent_path + ".png", (err, result) => {
+            file.mv('./files/' + curent_path + ext, (err, result) => {
                 if (err)
                     res.status(500).send()
-                var url = curent_path + ".png";
+                var url = curent_path + ext;
                 res.status(200).send(
-                    url.toString() + " "
+                    url.toString() + ""
                 )
             })
             ok = false;
@@ -33,10 +36,9 @@ app.post("/api/files/upload", (req, res, next) => {
 })
 
 app.delete("/api/files/:id", (req, res, next) => {
-    const file = req.files.photo;
     var ok = true;
-    if (fs.existsSync('./files/' + req.params.id + ".png") === true) {
-        fs.unlink('./files/' + req.params.id + ".png", (err) => {
+    if (fs.existsSync('./files/' + req.params.id) === true) {
+        fs.unlink('./files/' + req.params.id, (err) => {
             if (err) {
                 console.error(err)
                 return;
@@ -46,6 +48,8 @@ app.delete("/api/files/:id", (req, res, next) => {
             )
         })
         ok = false;
+    } else {
+        res.status(404).send();
     }
 })
 
@@ -53,7 +57,7 @@ app.get("/api/files/:id", (req, res, next) => {
     var file = ('./files/' + req.params.id);
     var s = fs.createReadStream(file);
     s.on('open', function () {
-        res.set('Content-Type', 'image/png');
+        res.set('Content-Type', mime.lookup(req.params.id));
         s.pipe(res);
     });
     s.on('error', function () {

@@ -12,6 +12,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
-    "formidable": "^1.2.2"
+    "formidable": "^1.2.2",
+    "mime": "^2.5.2",
+    "mime-db": "^1.47.0"
   }
 }
